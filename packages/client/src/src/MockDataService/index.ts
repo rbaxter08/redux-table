@@ -63,12 +63,7 @@ export function asyncDataFetch(page?: number, rowsPerPage?: number) {
   });
 }
 
-export type Data = {
-  id: string;
-  foo: number;
-};
-
-export const COLUMNS: Column<Data>[] = [
+export const COLUMNS: Column<DataType>[] = [
   {
     Header: 'Age',
     accessor: 'age',

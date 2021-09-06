@@ -1,11 +1,7 @@
 {
   "compilerOptions": {
     "target": "es5",
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
+    "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "skipLibCheck": true,
     "esModuleInterop": true,
@@ -21,6 +17,8 @@
     "isolatedModules": true
   },
   "include": [
-    "src"
-, "../recoil-table/selectors", "../recoil-table/selectors/selectedRows/.ts"  ]
+    "src",
+    "../redux-table/src",
+    "../redux-table/src/createTableSlice/.ts"
+  ]
 }
