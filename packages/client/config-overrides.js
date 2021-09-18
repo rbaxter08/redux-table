@@ -1,7 +1,7 @@
 const path = require('path');
 
 // A list of paths to transpile
-const nodeModulesToTranspileRel = ['../recoil-table', '../recoil-table-ui'];
+const nodeModulesToTranspileRel = ['../redux-table', '../recoil-table-ui'];
 const nodeModulesToTranspileAbs = nodeModulesToTranspileRel.map((name) =>
   path.resolve(__dirname, name),
 );

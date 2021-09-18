@@ -1,12 +1,20 @@
 import React from 'react';
 import { useDispatch } from 'react-redux';
+import { Button, Grid, Typography } from '@material-ui/core';
 import { useSelector } from './Redux';
-import { asyncDataFetch } from '../TableUtils';
-import { onDataLoad } from './Redux/TableSlice';
+import { asyncDataFetch } from './MockDataService';
+import {
+  onDataLoad,
+  selectRows,
+  selectColumns,
+  onClearFilters,
+  onColumnFilterChange,
+} from './Redux/TableSlice';
 
 export function ReduxTable() {
   const dispatch = useDispatch();
-  const data = useSelector((state) => state.data);
+  const rows = useSelector(selectRows);
+  const columns = useSelector(selectColumns);
 
   React.useEffect(() => {
     async function fetchData() {
@@ -17,10 +25,41 @@ export function ReduxTable() {
   }, [dispatch]);
 
   return (
-    <div>
-      {data.map((d) => (
-        <div>{d.name}</div>
+    <Grid container>
+      <Grid item xs={12} container>
+        {columns.map((column) => {
+          return (
+            <Grid item xs={2}>
+              <Typography variant="h5">{column.accessor}</Typography>
+            </Grid>
+          );
+        })}
+      </Grid>
+      {rows.map((d) => (
+        <Grid item container xs={12} style={{ border: '1px solid #eaeaea' }}>
+          {columns.map((column) => {
+            return (
+              <Grid item xs={2}>
+                {d.item[column.accessor]}
+              </Grid>
+            );
+          })}
+        </Grid>
       ))}
-    </div>
+      <Button
+        onClick={() =>
+          dispatch(
+            onColumnFilterChange({
+              columnId: 'age',
+              // @ts-ignore
+              filter: { operator: 'lt', value: 20 },
+            }),
+          )
+        }
+      >
+        Apply Filter
+      </Button>
+      <Button onClick={() => dispatch(onClearFilters())}>Clear Filter</Button>
+    </Grid>
   );
 }

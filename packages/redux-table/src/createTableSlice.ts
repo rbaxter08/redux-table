@@ -4,10 +4,8 @@ import {
   ValidateSliceCaseReducers,
   SliceCaseReducers,
 } from '@reduxjs/toolkit';
-
-interface TableState<T> {
-  data: T[];
-}
+import { createSelectors, TableState } from './createSelectors';
+import { NumericFilter } from './filterTypes';
 
 export const createTableSlice = <
   T,
@@ -15,23 +13,47 @@ export const createTableSlice = <
 >({
   name,
   initialState,
+  selectSelf = (state: TableState<T>) => state,
+  userFilterTypes = {},
+  getRowId,
   reducers = {} as ValidateSliceCaseReducers<TableState<T>, Reducers>,
 }: {
   name: string;
+  selectSelf?: (state: TableState<T>) => TableState<T>;
+  getRowId: (item: T) => string;
+  userFilterTypes: Object;
   initialState?: Partial<TableState<T>>;
   reducers?: ValidateSliceCaseReducers<TableState<T>, Reducers>;
 }) => {
-  return createSlice({
-    name,
-    initialState: {
-      data: [],
-      ...initialState,
-    } as TableState<T>,
-    reducers: {
-      onDataLoad(state: TableState<T>, action: PayloadAction<T[]>) {
-        state.data = action.payload;
+  return {
+    slice: createSlice({
+      name,
+      initialState: {
+        data: [],
+        test: false,
+        ...initialState,
+      } as TableState<T>,
+      reducers: {
+        onClearFilters(state: TableState<T>) {
+          state.columns.forEach((column) => {
+            column.filter = undefined;
+          });
+        },
+        onColumnFilterChange(
+          state: TableState<T>,
+          action: PayloadAction<{ columnId: string; filter: NumericFilter }>,
+        ) {
+          const column = state.columns.find(
+            (column) => column.accessor === action.payload.columnId,
+          );
+          if (column) column.filter = action.payload.filter;
+        },
+        onDataLoad(state: TableState<T>, action: PayloadAction<T[]>) {
+          state.data = action.payload;
+        },
+        ...reducers,
       },
-      ...reducers,
-    },
-  });
+    }),
+    selectors: createSelectors(selectSelf, getRowId, userFilterTypes),
+  };
 };

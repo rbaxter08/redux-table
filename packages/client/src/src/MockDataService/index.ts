@@ -1,5 +1,4 @@
 import namor from 'namor';
-import { Column } from 'recoil-table';
 
 const range = (len: number) => {
   const arr = [];
@@ -27,13 +26,12 @@ const newPerson = () => {
 };
 
 export default function makeData(...lens: any[]) {
-  // @ts-ignore
   const makeDataLevel = (depth = 0) => {
     const len = lens[depth];
-    return range(len).map((d) => {
+    return range(len).map((d, index) => {
       return {
+        id: index,
         ...newPerson(),
-        subRows: lens[depth + 1] ? makeDataLevel(depth + 1) : undefined,
       };
     });
   };
@@ -44,11 +42,13 @@ export default function makeData(...lens: any[]) {
 export const DATA = makeData(200);
 
 export interface DataType {
-  name: string;
-  calories: number;
-  fat: number;
-  carbs: number;
-  protein: number;
+  id: number;
+  firstName: string;
+  lastName: string;
+  age: number;
+  visits: number;
+  progress: number;
+  status: string;
 }
 
 export function asyncDataFetch(page?: number, rowsPerPage?: number) {
@@ -62,24 +62,3 @@ export function asyncDataFetch(page?: number, rowsPerPage?: number) {
     }
   });
 }
-
-export const COLUMNS: Column<DataType>[] = [
-  {
-    Header: 'Age',
-    accessor: 'age',
-    sortable: true,
-  },
-  {
-    Header: 'Visits',
-    accessor: 'visits',
-    sortable: true,
-  },
-  {
-    Header: 'Status',
-    accessor: 'status',
-  },
-  {
-    Header: 'Profile Progress',
-    accessor: 'progress',
-  },
-];
