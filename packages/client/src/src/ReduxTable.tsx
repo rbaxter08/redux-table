@@ -29,17 +29,23 @@ export function ReduxTable() {
       <Grid item xs={12} container>
         {columns.map((column) => {
           return (
-            <Grid item xs={2}>
+            <Grid item xs={2} key={column.accessor}>
               <Typography variant="h5">{column.accessor}</Typography>
             </Grid>
           );
         })}
       </Grid>
       {rows.map((d) => (
-        <Grid item container xs={12} style={{ border: '1px solid #eaeaea' }}>
+        <Grid
+          key={d.id}
+          item
+          container
+          xs={12}
+          style={{ border: '1px solid #eaeaea' }}
+        >
           {columns.map((column) => {
             return (
-              <Grid item xs={2}>
+              <Grid key={column.accessor} item xs={2}>
                 {d.item[column.accessor]}
               </Grid>
             );
@@ -51,8 +57,8 @@ export function ReduxTable() {
           dispatch(
             onColumnFilterChange({
               columnId: 'age',
-              // @ts-ignore
-              filter: { operator: 'lt', value: 20 },
+              operator: 'lt',
+              value: 20,
             }),
           )
         }

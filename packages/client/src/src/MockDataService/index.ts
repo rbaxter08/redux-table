@@ -41,7 +41,7 @@ export default function makeData(...lens: any[]) {
 
 export const DATA = makeData(200);
 
-export interface DataType {
+export interface Person {
   id: number;
   firstName: string;
   lastName: string;
@@ -52,7 +52,7 @@ export interface DataType {
 }
 
 export function asyncDataFetch(page?: number, rowsPerPage?: number) {
-  return new Promise<{ data: DataType[]; total: number }>((res) => {
+  return new Promise<{ data: Person[]; total: number }>((res) => {
     if (page !== undefined && rowsPerPage !== undefined) {
       const start = rowsPerPage * page;
       const end = start + rowsPerPage - 1;

@@ -1,5 +1,5 @@
 import { createSelector } from '@reduxjs/toolkit';
-import { filterTypes, NumericFilter } from './filterTypes';
+import { ColumnFilter } from './filterTypes';
 
 export interface Row<T> {
   id: string;
@@ -8,21 +8,23 @@ export interface Row<T> {
 
 export interface Column<T> {
   accessor: keyof T;
-  filter?: NumericFilter;
 }
 
-export interface TableState<T> {
+export interface TableState<T, F> {
   data: T[];
+  filters: ColumnFilter<T, F>[];
   columns: Column<T>[];
   config: boolean;
 }
 
-export function createSelectors<T>(
-  selectSelf: (state: TableState<T>) => TableState<T>,
+export function createSelectors<T, F>(
+  selectSelf: (state: TableState<T, F>) => TableState<T, F>,
   getRowId: (item: T) => string,
-  userFilterTypes = {},
+  filterTypes: F,
 ) {
-  const consolidatedFilterTypes = { ...filterTypes, ...userFilterTypes };
+  const selectFilters = createSelector(selectSelf, (state) => {
+    return state.filters;
+  });
 
   const selectColumns = createSelector(selectSelf, (state) => {
     return state.columns;
@@ -39,18 +41,18 @@ export function createSelectors<T>(
   const selectFilteredRows = createSelector(
     selectSortedRows,
     selectColumns,
-    (data, columns) => {
-      // if data item does not pass any of the filters applied to any of the columns
-      // remove it
+    selectFilters,
+    (data, columns, filters) => {
       return data.filter((item) =>
-        columns.every((column) => {
-          if (column.filter) {
+        filters.every((filter) => {
+          const column = columns.find(
+            (column) => column.accessor === filter.columnId,
+          );
+          if (column) {
+            const itemValue = item[column.accessor];
+            const filterFunc = filterTypes[filter.operator];
             // @ts-ignore
-            const itemValue: number = item[column.accessor];
-            return consolidatedFilterTypes[column.filter.operator](
-              itemValue,
-              column.filter.value,
-            );
+            return filterFunc(itemValue, filter.value);
           }
           return true;
         }),

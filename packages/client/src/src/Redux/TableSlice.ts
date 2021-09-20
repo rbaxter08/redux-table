@@ -1,14 +1,14 @@
-import { createTableSlice } from 'redux-table';
-import { DataType } from '../MockDataService';
+import { createTableSlice, createFilterTypes } from 'redux-table';
+import { Person } from '../MockDataService';
 
 const tableSlice = createTableSlice({
-  getRowId: (item) => item.firstName,
-  userFilterTypes: {
-    lt: (itemValue: number, currValue: number) => itemValue < currValue,
-  },
   name: 'my-table',
+  getRowId: (item) => item.firstName,
+  filterTypes: createFilterTypes({
+    lt: (itemValue: number, currValue: number) => itemValue < currValue,
+  }),
   initialState: {
-    data: [] as DataType[],
+    data: [] as Person[],
     columns: [
       {
         accessor: 'firstName',

@@ -5,55 +5,75 @@ import {
   SliceCaseReducers,
 } from '@reduxjs/toolkit';
 import { createSelectors, TableState } from './createSelectors';
-import { NumericFilter } from './filterTypes';
+import { ColumnFilter, createFilterTypes } from './filterTypes';
 
-export const createTableSlice = <
+interface Props<DataType, F> {
+  name: string;
+  initialState?: Partial<TableState<DataType, F>>;
+  selectSelf?: (state: TableState<DataType, F>) => TableState<DataType, F>;
+  getRowId: (item: DataType) => string;
+  filterTypes?: F;
+}
+
+export function createTableSlice<DataType, F>({
+  name,
+  initialState,
+  selectSelf = (state: TableState<DataType, F>) => state,
+  filterTypes = {} as F,
+  getRowId,
+}: Props<DataType, F>) {
+  const consolidatedFilterTypes = createFilterTypes(filterTypes);
+  const slice = createTableSliceHelper({ name, initialState });
+  const selectors = createSelectors(
+    selectSelf,
+    getRowId,
+    consolidatedFilterTypes,
+  );
+  return { slice, selectors };
+}
+
+const createTableSliceHelper = <
   T,
-  Reducers extends SliceCaseReducers<TableState<T>>
+  F,
+  Reducers extends SliceCaseReducers<TableState<T, F>>
 >({
   name,
   initialState,
-  selectSelf = (state: TableState<T>) => state,
-  userFilterTypes = {},
-  getRowId,
-  reducers = {} as ValidateSliceCaseReducers<TableState<T>, Reducers>,
+  reducers = {} as ValidateSliceCaseReducers<TableState<T, F>, Reducers>,
 }: {
   name: string;
-  selectSelf?: (state: TableState<T>) => TableState<T>;
-  getRowId: (item: T) => string;
-  userFilterTypes: Object;
-  initialState?: Partial<TableState<T>>;
-  reducers?: ValidateSliceCaseReducers<TableState<T>, Reducers>;
+  initialState?: Partial<TableState<T, F>>;
+  reducers?: ValidateSliceCaseReducers<TableState<T, F>, Reducers>;
 }) => {
-  return {
-    slice: createSlice({
-      name,
-      initialState: {
-        data: [],
-        test: false,
-        ...initialState,
-      } as TableState<T>,
-      reducers: {
-        onClearFilters(state: TableState<T>) {
-          state.columns.forEach((column) => {
-            column.filter = undefined;
-          });
-        },
-        onColumnFilterChange(
-          state: TableState<T>,
-          action: PayloadAction<{ columnId: string; filter: NumericFilter }>,
-        ) {
-          const column = state.columns.find(
-            (column) => column.accessor === action.payload.columnId,
-          );
-          if (column) column.filter = action.payload.filter;
-        },
-        onDataLoad(state: TableState<T>, action: PayloadAction<T[]>) {
-          state.data = action.payload;
-        },
-        ...reducers,
+  return createSlice({
+    name,
+    initialState: {
+      data: [],
+      filters: [],
+      test: false,
+      ...initialState,
+    } as TableState<T, F>,
+    reducers: {
+      onClearFilters(state: TableState<T, F>) {
+        state.filters = [];
       },
-    }),
-    selectors: createSelectors(selectSelf, getRowId, userFilterTypes),
-  };
+      onColumnFilterChange(
+        state: TableState<T, F>,
+        action: PayloadAction<ColumnFilter<T, F>>,
+      ) {
+        const filterIndex = state.filters.findIndex(
+          (filter) => filter.columnId === action.payload.columnId,
+        );
+        if (filterIndex >= 0) {
+          state.filters[filterIndex] = action.payload;
+        } else {
+          state.filters.push(action.payload);
+        }
+      },
+      onDataLoad(state: TableState<T, F>, action: PayloadAction<T[]>) {
+        state.data = action.payload;
+      },
+      ...reducers,
+    },
+  });
 };
