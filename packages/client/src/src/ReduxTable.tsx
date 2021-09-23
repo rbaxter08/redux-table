@@ -1,33 +1,31 @@
 import React from 'react';
 import { useDispatch } from 'react-redux';
-import { Button, Grid, Typography } from '@material-ui/core';
+import { Grid, Typography } from '@material-ui/core';
 import { useSelector } from './Redux';
 import { asyncDataFetch } from './MockDataService';
-import {
-  onDataLoad,
-  selectRows,
-  selectColumns,
-  onClearFilters,
-  onColumnFilterChange,
-} from './Redux/TableSlice';
+// import { onDataLoad, selectData, selectColumns } from './Redux/TableSlice';
 
 export function ReduxTable() {
   const dispatch = useDispatch();
-  const rows = useSelector(selectRows);
-  const columns = useSelector(selectColumns);
+  // const rows: any = useSelector(selectData);
+  // const columns: any = useSelector(selectColumns);
 
-  React.useEffect(() => {
-    async function fetchData() {
-      const { data } = await asyncDataFetch();
-      dispatch(onDataLoad(data));
-    }
-    fetchData();
-  }, [dispatch]);
+  // console.log('columns', columns);
+  // console.log('rows', rows);
 
+  // React.useEffect(() => {
+  //   async function fetchData() {
+  //     const { data } = await asyncDataFetch();
+  //     dispatch(onDataLoad(data));
+  //   }
+  //   fetchData();
+  // }, [dispatch]);
+
+  // console.log(columns);
   return (
     <Grid container>
-      <Grid item xs={12} container>
-        {columns.map((column) => {
+      {/* <Grid item xs={12} container>
+        {columns.map((column: any) => {
           return (
             <Grid item xs={2} key={column.accessor}>
               <Typography variant="h5">{column.accessor}</Typography>
@@ -35,7 +33,7 @@ export function ReduxTable() {
           );
         })}
       </Grid>
-      {rows.map((d) => (
+      {rows.slice(15).map((d: any) => (
         <Grid
           key={d.id}
           item
@@ -43,7 +41,7 @@ export function ReduxTable() {
           xs={12}
           style={{ border: '1px solid #eaeaea' }}
         >
-          {columns.map((column) => {
+          {columns.map((column: any) => {
             return (
               <Grid key={column.accessor} item xs={2}>
                 {d.item[column.accessor]}
@@ -51,21 +49,7 @@ export function ReduxTable() {
             );
           })}
         </Grid>
-      ))}
-      <Button
-        onClick={() =>
-          dispatch(
-            onColumnFilterChange({
-              columnId: 'age',
-              operator: 'lt',
-              value: 20,
-            }),
-          )
-        }
-      >
-        Apply Filter
-      </Button>
-      <Button onClick={() => dispatch(onClearFilters())}>Clear Filter</Button>
+      ))} */}
     </Grid>
   );
 }

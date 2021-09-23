@@ -3,10 +3,10 @@ import {
   useSelector as REDUXuseSelector,
 } from 'react-redux';
 import { configureStore } from '@reduxjs/toolkit';
-import tableSlice from './TableSlice';
+import tableReducer from './TableSlice';
 
 export const store = configureStore({
-  reducer: tableSlice.reducer,
+  reducer: tableReducer,
 });
 
 export type RootState = ReturnType<typeof store.getState>;

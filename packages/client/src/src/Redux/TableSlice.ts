@@ -1,41 +1,53 @@
-import { createTableSlice, createFilterTypes } from 'redux-table';
+import { createTableSlice, tableFiltersPlugin } from 'redux-table';
 import { Person } from '../MockDataService';
 
 const tableSlice = createTableSlice({
-  name: 'my-table',
-  getRowId: (item) => item.firstName,
-  filterTypes: createFilterTypes({
-    lt: (itemValue: number, currValue: number) => itemValue < currValue,
-  }),
-  initialState: {
-    data: [] as Person[],
-    columns: [
-      {
-        accessor: 'firstName',
-      },
-      {
-        accessor: 'lastName',
-      },
-      {
-        accessor: 'age',
-      },
-      {
-        accessor: 'visits',
-      },
-      {
-        accessor: 'progress',
-      },
-      {
-        accessor: 'status',
-      },
-    ],
-  },
+  name: 'mySlice',
+  plugins: [
+    tableFiltersPlugin({
+      initialState: { filters: [{ columnId: '1', operator: 'eq', value: 0 }] },
+    }),
+  ],
 });
 
-export const {
-  onDataLoad,
-  onColumnFilterChange,
-  onClearFilters,
-} = tableSlice.slice.actions;
-export const { selectRows, selectColumns } = tableSlice.selectors;
-export default tableSlice.slice;
+const {} = tableSlice.actions;
+
+export default tableSlice.rootReducer;
+
+// const tableSlice = createTableSlice({
+//   name: 'table-demo',
+//   plugins: [
+//     tableFiltersPlugin({
+//       initialState: { filters: [{ columnId: '1', operator: 'eq', value: 0 }] },
+//     }),
+//   ],
+//   initialState: {
+//     data: [] as Person[],
+//     columns: [
+//       {
+//         accessor: 'firstName',
+//       },
+//       {
+//         accessor: 'lastName',
+//       },
+//       {
+//         accessor: 'age',
+//       },
+//       {
+//         accessor: 'visits',
+//       },
+//       {
+//         accessor: 'progress',
+//       },
+//       {
+//         accessor: 'status',
+//       },
+//     ],
+//   },
+// });
+
+// // @ts-ignore
+// export const { onDataLoad } = tableSlice.actions;
+
+// // @ts-ignore
+// export const { selectData, selectColumns } = tableSlice.selectors;
