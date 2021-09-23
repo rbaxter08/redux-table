@@ -52,13 +52,22 @@ type PluginArray<T extends ReadonlyArray<PluginGenerator<any>>> = {
   [Key in keyof T]: T[Key] extends PluginGenerator<infer Slice> ? Slice : never;
 };
 
-function baz<T extends ReadonlyArray<PluginGenerator<any>>>(
-  ...plugins: T
-): PluginArray<T> {
-  return plugins.map((plugin) => plugin('test')) as any;
+interface Props {
+  name: string;
 }
 
-const x = baz(foo({ footers: [] }), boo({ booters: ['string'] }));
+function baz<T extends ReadonlyArray<PluginGenerator<any>>>(
+  { name }: Props,
+  ...plugins: T
+): PluginArray<T> {
+  return plugins.map((plugin) => plugin(name)) as any;
+}
+
+const x = baz(
+  { name: 'myTable' },
+  foo({ footers: [] }),
+  boo({ booters: ['string'] }),
+);
 
 x[0].actions.onDataLoad;
 x[1].actions.onBooLoad;
