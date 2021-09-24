@@ -1,9 +1,10 @@
-import { createSelector } from '@reduxjs/toolkit';
+export default undefined;
+// import { createSelector } from '@reduxjs/toolkit';
 
-export interface Row<T> {
-  id: string;
-  item: T;
-}
+// export interface Row<T> {
+//   id: string;
+//   item: T;
+// }
 
 // export function createSelectors<T>(
 //   selectSelf: (state: TableState<T>) => TableState<T>,

@@ -1,5 +1,5 @@
-import { createSlice, PayloadAction, Slice } from '@reduxjs/toolkit';
-import { TableSlice, TablePlugin } from './types';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { TablePlugin } from './types';
 
 interface ColumnFilter {
   columnId: string;
@@ -11,24 +11,17 @@ interface FilterState {
   filters: ColumnFilter[];
 }
 
-export interface FilterSliceProps {
-  initialState?: Partial<FilterState>;
-}
-
 const defaultInitialState: FilterState = {
   filters: [],
 };
 
-const namePostFix = '@ReduxTableFilters';
+type FilterSlice = ReturnType<typeof createFilterSlice>;
 
-type TableFilterSlice = ReturnType<typeof createFilterSlice>;
+const slicePrefix = '@ReduxTableFilters';
 
-export function createFilterSlice(
-  name: string,
-  { initialState }: FilterSliceProps,
-): TableSlice {
-  const slice = createSlice({
-    name: `${namePostFix}-${name}`,
+function createFilterSlice(name: string, initialState: FilterState) {
+  return createSlice({
+    name: `${slicePrefix}-${name}`,
     initialState: {
       ...defaultInitialState,
       ...initialState,
@@ -49,12 +42,10 @@ export function createFilterSlice(
       },
     },
   });
-
-  return {
-    slice,
-  };
 }
 
-export const tableFiltersPlugin: TablePlugin<FilterSliceProps> = (props) => {
-  return (name) => createFilterSlice(name, props);
-};
+export function tableFiltersPlugin(
+  initialState: FilterState,
+): TablePlugin<FilterSlice> {
+  return (name) => createFilterSlice(name, initialState);
+}

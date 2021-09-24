@@ -3,9 +3,7 @@ import {
   PayloadAction,
   ValidateSliceCaseReducers,
   SliceCaseReducers,
-  createSelector,
 } from '@reduxjs/toolkit';
-import { TablePlugin } from './types';
 
 export interface Column<T> {
   accessor: keyof T;
@@ -16,29 +14,35 @@ export interface TableState<T> {
   columns: Column<T>[];
 }
 
-interface BaseSliceProps<T> {
-  selectSelf?: (state: TableState<T>) => TableState<T>;
-  initialState?: Partial<TableState<T>>;
-}
+const slicePrefix = '@ReduxTable';
 
-type BaseTableSlice = ReturnType<typeof createBaseTableSlice>;
+// function createSelectors<T>(
+//   name: string,
+//   selectSelf: (state: TableState<T>) => TableState<T>,
+// ) {
+//   const selectColumns = createSelector(selectSelf, (state) => {
+//     // @ts-ignore
+//     return state[name].columns;
+//   });
 
-const namePostFix = '@ReduxTable';
+//   const selectData = createSelector(selectSelf, (state) => {
+//     // @ts-ignore
+//     return state[name].data.map((d, index) => ({ id: index, item: d }));
+//   });
 
-export function createBaseTableSlice<
+//   return {
+//     selectColumns,
+//     selectData,
+//   };
+// }
+
+function createBaseTableSlice<
   T,
   Reducers extends SliceCaseReducers<TableState<T>>
->(name: string, props: BaseSliceProps<T>) {
-  const { selectSelf, initialState } = props;
-
-  // const selectors = createSelectors(`${namePostFix}-${name}`, selectSelf);
-  const slice = createSlice({
-    name: `${namePostFix}-${name}`,
-    initialState: {
-      data: [],
-      columns: [],
-      ...initialState,
-    } as TableState<T>,
+>(name: string, initialState: TableState<T>) {
+  return createSlice({
+    name: `${slicePrefix}-${name}`,
+    initialState,
     reducers: {
       onDataLoad(state: TableState<T>, action: PayloadAction<T[]>) {
         state.data = action.payload;
@@ -46,37 +50,8 @@ export function createBaseTableSlice<
       ...({} as ValidateSliceCaseReducers<TableState<T>, Reducers>),
     },
   });
-
-  return {
-    // selectors,
-    slice,
-  };
 }
 
-function createSelectors<T>(
-  name: string,
-  selectSelf: (state: TableState<T>) => TableState<T>,
-) {
-  const selectColumns = createSelector(selectSelf, (state) => {
-    // @ts-ignore
-    return state[name].columns;
-  });
-
-  const selectData = createSelector(selectSelf, (state) => {
-    // @ts-ignore
-    return state[name].data.map((d, index) => ({ id: index, item: d }));
-  });
-
-  return {
-    selectColumns,
-    selectData,
-  };
+export function baseTablePlugin<T>(initialState: TableState<T>) {
+  return (name: string) => createBaseTableSlice(name, initialState);
 }
-
-export const baseTablePlugin: TablePlugin<BaseSliceProps<any>> = <T>(
-  props: BaseSliceProps<T>,
-) => {
-  return (name: string) => createBaseTableSlice(name, props);
-};
-
-export default createBaseTableSlice;

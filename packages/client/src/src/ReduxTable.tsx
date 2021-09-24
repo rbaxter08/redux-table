@@ -1,30 +1,30 @@
 import React from 'react';
 import { useDispatch } from 'react-redux';
-import { Grid, Typography } from '@material-ui/core';
+import { Grid, Button, Typography } from '@material-ui/core';
 import { useSelector } from './Redux';
 import { asyncDataFetch } from './MockDataService';
-// import { onDataLoad, selectData, selectColumns } from './Redux/TableSlice';
+import {
+  onDataLoad,
+  onColumnFilterChange,
+  onClearFilters,
+} from './Redux/TableSlice';
 
 export function ReduxTable() {
   const dispatch = useDispatch();
-  // const rows: any = useSelector(selectData);
-  // const columns: any = useSelector(selectColumns);
+  const rows = useSelector((state) => state.table.data);
+  const columns = useSelector((state) => state.table.columns);
 
-  // console.log('columns', columns);
-  // console.log('rows', rows);
+  React.useEffect(() => {
+    async function fetchData() {
+      const { data } = await asyncDataFetch();
+      dispatch(onDataLoad(data));
+    }
+    fetchData();
+  }, [dispatch]);
 
-  // React.useEffect(() => {
-  //   async function fetchData() {
-  //     const { data } = await asyncDataFetch();
-  //     dispatch(onDataLoad(data));
-  //   }
-  //   fetchData();
-  // }, [dispatch]);
-
-  // console.log(columns);
   return (
     <Grid container>
-      {/* <Grid item xs={12} container>
+      <Grid item xs={12} container>
         {columns.map((column: any) => {
           return (
             <Grid item xs={2} key={column.accessor}>
@@ -44,12 +44,26 @@ export function ReduxTable() {
           {columns.map((column: any) => {
             return (
               <Grid key={column.accessor} item xs={2}>
-                {d.item[column.accessor]}
+                {d[column.accessor]}
               </Grid>
             );
           })}
         </Grid>
-      ))} */}
+      ))}
+      <Button
+        onClick={() =>
+          dispatch(
+            onColumnFilterChange({
+              columnId: 'age',
+              operator: 'lt',
+              value: 20,
+            }),
+          )
+        }
+      >
+        Apply Filter
+      </Button>
+      <Button onClick={() => dispatch(onClearFilters())}>Clear Filter</Button>
     </Grid>
   );
 }
